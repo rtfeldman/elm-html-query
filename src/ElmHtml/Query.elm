@@ -9,6 +9,7 @@ module ElmHtml.Query
         , queryByClassList
         , queryByClassName
         , queryById
+        , queryByListensTo
         , queryByStyle
         , queryByTagName
         , queryChildren
@@ -19,7 +20,7 @@ module ElmHtml.Query
 {-| Query things using ElmHtml
 
 @docs Selector
-@docs query, queryAll, queryChildren, queryChildrenAll, queryInNode
+@docs query, queryAll, queryChildren, queryChildrenAll, queryInNode, queryByListensTo
 @docs queryById, queryByClassName, queryByClassList, queryByStyle, queryByTagName, queryByAttribute, queryByBoolAttribute
 @docs getChildren
 
@@ -46,6 +47,7 @@ type Selector
     | BoolAttribute String Bool
     | Style (List ( String, String ))
     | ContainsText String
+    | ListensTo String
     | Multiple (List Selector)
 
 
@@ -96,6 +98,13 @@ queryByAttribute key value =
 queryByBoolAttribute : String -> Bool -> ElmHtml msg -> List (ElmHtml msg)
 queryByBoolAttribute key value =
     query (BoolAttribute key value)
+
+
+{-| Query for an ElmHtml element which is listening for the given event name.
+-}
+queryByListensTo : String -> ElmHtml msg -> List (ElmHtml msg)
+queryByListensTo eventName =
+    query (ListensTo eventName)
 
 
 {-| Query an ElmHtml element using a selector, searching all children.
@@ -244,6 +253,11 @@ hasBoolAttribute attribute value facts =
             False
 
 
+hasEventListener : String -> Facts msg -> Bool
+hasEventListener eventName facts =
+    Dict.member eventName facts.events
+
+
 hasClass : String -> Facts msg -> Bool
 hasClass query facts =
     List.member query (classnames facts)
@@ -300,6 +314,10 @@ nodeRecordPredicate selector =
             .facts
                 >> hasBoolAttribute key value
 
+        ListensTo eventName ->
+            .facts
+                >> hasEventListener eventName
+
         Style style ->
             .facts
                 >> hasStyle style
@@ -337,6 +355,10 @@ markdownPredicate selector =
         BoolAttribute key value ->
             .facts
                 >> hasBoolAttribute key value
+
+        ListensTo eventName ->
+            .facts
+                >> hasEventListener eventName
 
         Style style ->
             .facts
