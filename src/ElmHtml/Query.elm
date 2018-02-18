@@ -1,39 +1,41 @@
 module ElmHtml.Query
     exposing
         ( Selector(..)
+        , getChildren
         , query
         , queryAll
-        , queryInNode
-        , queryChildren
-        , queryChildrenAll
-        , queryById
-        , queryByClassName
-        , queryByClassList
-        , queryByStyle
-        , queryByTagName
         , queryByAttribute
         , queryByBoolAttribute
-        , getChildren
+        , queryByClassList
+        , queryByClassName
+        , queryById
+        , queryByStyle
+        , queryByTagName
+        , queryChildren
+        , queryChildrenAll
+        , queryInNode
         )
 
-{-|
-Query things using ElmHtml
+{-| Query things using ElmHtml
 
 @docs Selector
 @docs query, queryAll, queryChildren, queryChildrenAll, queryInNode
 @docs queryById, queryByClassName, queryByClassList, queryByStyle, queryByTagName, queryByAttribute, queryByBoolAttribute
 @docs getChildren
+
 -}
 
 import Dict
-import String
 import ElmHtml.InternalTypes exposing (..)
+import String
 
 
 {-| Selectors to query a Html element
-- Id, classname, classlist, tag are all what you'd expect
-- Attribute and bool attribute are attributes
-- ConainsText just searches inside for the given text
+
+  - Id, classname, classlist, tag are all what you'd expect
+  - Attribute and bool attribute are attributes
+  - ConainsText just searches inside for the given text
+
 -}
 type Selector
     = Id String
@@ -155,10 +157,10 @@ queryInNodeHelp maxDescendantDepth selector node =
                 childEntries =
                     descendInQuery maxDescendantDepth selector record.children
             in
-                if predicateFromSelector selector node then
-                    node :: childEntries
-                else
-                    childEntries
+            if predicateFromSelector selector node then
+                node :: childEntries
+            else
+                childEntries
 
         TextTag { text } ->
             case selector of
